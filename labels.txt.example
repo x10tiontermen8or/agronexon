@@ -1,0 +1,6 @@
+# Rename this file to labels.txt and preserve the exact class order used in training.
+# Example PlantVillage labels only; replace with YOUR model's output class order.
+Apple___Apple_scab
+Apple___Black_rot
+Apple___Cedar_apple_rust
+Apple___healthy
