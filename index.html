@@ -1,162 +1,126 @@
-# 
 
-# <!DOCTYPE html>
-
-# <html lang="en">
-
-# <head>
-
-# <meta charset="UTF-8">
-
-# <meta name="viewport" content="width=device-width, initial-scale=1">
-
-# <title>AgroNexon Dashboard</title>
-
-# <style>
-
-# body{margin:0;background:#101a13;color:#eef5ed;font-family:Arial;padding:25px}
-
-# header{display:flex;justify-content:space-between;align-items:center}
-
-# h1{color:#a8dc8d}
-
-# .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:25px}
-
-# .card{background:#1b2b20;padding:22px;border-radius:14px;border:1px solid #36523b}
-
-# .value{font-size:30px;color:#a8dc8d;font-weight:bold}
-
-# button{padding:12px 18px;margin:5px;background:#477c4b;color:white;border:0;border-radius:8px;cursor:pointer}
-
-# .status{color:#f2c66d}
-
-# </style>
-
-# </head>
-
-# <body>
-
-# <header>
-
-# &#x20;<div><h1>🌱 AgroNexon</h1>
-
-# &#x20;<p>Precision Agriculture Rover System</p></div>
-
-# &#x20;<div class="status" id="status">● Awaiting rover connection</div>
-
-# </header>
-
-# 
-
-# <div class="grid">
-
-# &#x20;<div class="card"><h3>Soil Moisture</h3>
-
-# &#x20;<div class="value" id="soil">-- %</div></div>
-
-# &#x20;<div class="card"><h3>Obstacle Distance</h3>
-
-# &#x20;<div class="value" id="distance">-- cm</div></div>
-
-# &#x20;<div class="card"><h3>Obstacle Status</h3>
-
-# &#x20;<div class="value" id="obstacle">--</div></div>
-
-# &#x20;<div class="card"><h3>Rover Control</h3>
-
-# &#x20;<button onclick="send('forward')">Forward</button>
-
-# &#x20;<button onclick="send('left')">Left</button>
-
-# &#x20;<button onclick="send('stop')">STOP</button>
-
-# &#x20;<button onclick="send('right')">Right</button>
-
-# &#x20;<button onclick="send('backward')">Reverse</button>
-
-# &#x20;</div>
-
-# &#x20;<div class="card"><h3>Pump Control</h3>
-
-# &#x20;<button onclick="pump(1)">Pump ON</button>
-
-# &#x20;<button onclick="pump(0)">Pump OFF</button>
-
-# &#x20;<p id="pump">Unknown</p></div>
-
-# &#x20;<div class="card"><h3>Camera Monitoring</h3>
-
-# &#x20;<p>ESP32-CAM stream connection pending</p>
-
-# &#x20;</div>
-
-# </div>
-
-# 
-
-# <script>
-
-# const API = ""; // Add your secure rover API URL here
-
-# 
-
-# async function getData(){
-
-# &#x20;if(!API) return;
-
-# &#x20;try{
-
-# &#x20; const r=await fetch(API+"/api/status");
-
-# &#x20; const d=await r.json();
-
-# &#x20; document.getElementById("soil").textContent=d.soil\_percent+" %";
-
-# &#x20; document.getElementById("distance").textContent=d.distance\_cm+" cm";
-
-# &#x20; document.getElementById("obstacle").textContent=d.obstacle?"Detected":"Clear";
-
-# &#x20; document.getElementById("pump").textContent=d.pump?"ON":"OFF";
-
-# &#x20; document.getElementById("status").textContent="● Connected";
-
-# &#x20;}catch(e){
-
-# &#x20; document.getElementById("status").textContent="● Connection unavailable";
-
-# &#x20;}
-
-# }
-
-# async function send(direction){
-
-# &#x20;if(!API){alert("Rover API not configured");return;}
-
-# &#x20;try{await fetch(API+"/api/move?dir="+direction);}
-
-# &#x20;catch(e){alert("Command failed");}
-
-# }
-
-# async function pump(value){
-
-# &#x20;if(!API){alert("Rover API not configured");return;}
-
-# &#x20;try{await fetch(API+"/api/pump?v="+value);}
-
-# &#x20;catch(e){alert("Pump command failed");}
-
-# }
-
-# setInterval(getData,2000);
-
-# getData();
-
-# </script>
-
-# </body>
-
-# </html>
-
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgroNexon | Smart Agriculture</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b120e;color:#edf5ef;font-family:Arial,sans-serif}
+.sidebar{position:fixed;inset:0 auto 0 0;width:225px;background:#101b14;border-right:1px solid #263a2c;padding:28px 20px}
+.brand{font-size:24px;font-weight:bold;color:#a9df88;margin-bottom:40px}
+.nav{padding:13px;color:#a9b9ac;border-radius:9px;margin:8px 0}
+.nav.active{background:#203728;color:#b9e69a}
+main{margin-left:225px;padding:35px;max-width:1500px}
+h1{font-size:32px;margin:5px 0}
+.muted{color:#8fa295}
+.status{color:#f1c878;background:#302719;padding:9px 14px;border-radius:20px;font-size:12px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.hero{padding:25px;background:linear-gradient(110deg,#24452d,#14231a);border:1px solid #36583d;border-radius:16px;margin-bottom:22px}
+.hero h2{margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
+.card{background:#142019;border:1px solid #293e30;border-radius:15px;padding:20px}
+.card h3{font-size:14px;color:#a9baad;margin-top:0}
+.value{font-size:30px;font-weight:bold;color:#a9df88;margin:14px 0}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.camera{height:220px;background:#0c1510;border:1px dashed #47634c;border-radius:12px;display:grid;place-items:center;text-align:center;color:#a9baad;padding:15px}
+input{width:100%;padding:10px;background:#0c1510;border:1px solid #3a5140;color:white;border-radius:8px;margin:8px 0}
+button{background:#9bd67c;color:#122016;border:0;border-radius:9px;padding:11px 16px;margin:4px;font-weight:bold;cursor:pointer}
+button.dark{background:#24372a;color:#e5f0e7}
+button.stop{background:#773d3d;color:white}
+.pad{display:grid;grid-template-columns:repeat(3,65px);gap:8px;justify-content:center;margin:20px}
+.pad button{height:55px;font-size:20px}
+footer{margin-top:28px;color:#75887a;font-size:12px;text-align:center}
+@media(max-width:850px){.sidebar{position:static;width:auto;padding:15px}.nav{display:inline-block;margin:0 2px;padding:9px}main{margin:0;padding:20px}.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
+@media(max-width:450px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;gap:10px;flex-direction:column}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+ <div class="brand">🌱 AgroNexon</div>
+ <div class="nav active">▦ &nbsp; Dashboard</div>
+ <div class="nav">◉ &nbsp; Monitoring</div>
+ <div class="nav">⌘ &nbsp; Rover Control</div>
+ <div class="nav">⚙ &nbsp; System Status</div>
+ <p class="muted" style="margin-top:60px;font-size:12px">PRECISION AGRICULTURE ROVER</p>
+</aside>
+
+<main>
+ <div class="top">
+  <div><p style="color:#a9df88;font-size:11px;letter-spacing:2px">CONTROL CENTER</p>
+  <h1>Rover Dashboard</h1>
+  <p class="muted">Smart farming. Smarter decisions.</p></div>
+  <span class="status">● Dashboard Online</span>
+ </div>
+
+ <section class="hero">
+  <h2>Welcome to AgroNexon</h2>
+  <p class="muted">Precision agriculture rover monitoring and control interface.</p>
+ </section>
+
+ <section class="grid">
+  <div class="card"><h3>💧 SOIL MOISTURE</h3><div class="value">-- %</div><p class="muted">Awaiting sensor data</p></div>
+  <div class="card"><h3>📡 OBSTACLE DISTANCE</h3><div class="value">-- cm</div><p class="muted">Ultrasonic sensor</p></div>
+  <div class="card"><h3>🛡️ OBSTACLE STATUS</h3><div class="value">--</div><p class="muted">Awaiting sensor data</p></div>
+  <div class="card"><h3>🚿 PUMP STATUS</h3><div class="value">--</div><p class="muted">Relay feedback pending</p></div>
+ </section>
+
+ <section class="layout">
+  <div class="card">
+   <h3>📷 LIVE CAMERA</h3>
+   <div class="camera" id="cameraBox">
+    <div id="cameraMessage">Camera not connected<br><small>Enter your ESP32-CAM stream URL below</small></div>
+    <img id="camera" style="display:none;width:100%;height:100%;object-fit:contain" alt="Rover camera">
+   </div>
+   <input id="cameraUrl" placeholder="http://ESP32-CAM-IP:81/stream">
+   <button onclick="connectCamera()">Connect Camera</button>
+  </div>
+
+  <div class="card">
+   <h3>🎮 ROVER MOVEMENT</h3>
+   <div class="pad">
+    <span></span><button class="dark" onclick="move('forward')">▲</button><span></span>
+    <button class="dark" onclick="move('left')">◀</button>
+    <button class="stop" onclick="move('stop')">■</button>
+    <button class="dark" onclick="move('right')">▶</button>
+    <span></span><button class="dark" onclick="move('backward')">▼</button><span></span>
+   </div>
+   <p id="message" class="muted" style="text-align:center">Rover API not connected. Controls are in demo mode.</p>
+   <hr style="border-color:#293e30;margin:22px 0">
+   <h3>🚿 PUMP CONTROL</h3>
+   <button onclick="pump(1)">Pump ON</button>
+   <button class="dark" onclick="pump(0)">Pump OFF</button>
+  </div>
+ </section>
+
+ <div class="card" style="margin-top:18px">
+  <h3>⚙ SYSTEM STATUS</h3>
+  <p>Dashboard hosting <span style="float:right;color:#a9df88">ONLINE</span></p>
+  <p>ESP32 connection <span style="float:right;color:#f1c878">NOT CONNECTED</span></p>
+  <p>Camera connection <span style="float:right;color:#f1c878">PENDING</span></p>
+  <p>Remote control API <span style="float:right;color:#f1c878">NOT CONFIGURED</span></p>
+ </div>
+ <footer>AgroNexon | Precision Agriculture Rover | Project Prototype</footer>
+</main>
+
+<script>
+function move(direction){
+ document.getElementById("message").textContent=
+ "Demo mode: "+direction+" command not sent. Rover API is not configured.";
+}
+function pump(value){
+ document.getElementById("message").textContent=
+ "Demo mode: Pump "+(value?"ON":"OFF")+" command not sent.";
+}
+function connectCamera(){
+ const url=document.getElementById("cameraUrl").value.trim();
+ if(!url){alert("Enter the camera stream URL");return;}
+ const img=document.getElementById("camera");
+ img.onload=()=>{img.style.display="block";document.getElementById("cameraMessage").style.display="none";};
+ img.onerror=()=>{alert("Camera could not connect. Check its IP and network.");};
+ img.src=url;
+}
+</script>
+</body>
+</html>
